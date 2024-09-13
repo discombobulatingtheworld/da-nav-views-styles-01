@@ -44,73 +44,32 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.ucu2024_android_navigation_views_styles_leccion1.R
-import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.alt1.Ucu2024androidnavigationviewsstylesleccion1Theme
-import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.views.home.HomeView
+import com.example.ucu2024_android_navigation_views_styles_leccion1.state.LoginInput
+import com.example.ucu2024_android_navigation_views_styles_leccion1.state.LoginState
+import com.example.ucu2024_android_navigation_views_styles_leccion1.state.PasswordLoginInput
+import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.AppTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 
+
 @Composable
-fun LoginView(modifier: Modifier, navController: NavController, scope: CoroutineScope, snackbarHostState: SnackbarHostState) {
-    val formState = LoginState(navController, scope, snackbarHostState)
+fun LoginView(onLoginNavigation: (String) -> Unit = {}) {
+    val formState = LoginState(
+        onLoginNavigation,
+        rememberCoroutineScope(),
+        remember { SnackbarHostState() },
+        )
     formState.nameInput.value = remember { mutableStateOf<String>("") }
     formState.passwordInput.value = remember { mutableStateOf<String>("") }
     formState.passwordInput.isVisible = remember { mutableStateOf<Boolean>(false) }
 
-    Column() {
-        LoginBanner()
-        LoginPanel(formState)
-    }
-}
-
-private class LoginState(navController: NavController, scope: CoroutineScope, snackbarHostState: SnackbarHostState) {
-    val nameInput: LoginInput = LoginInput(name = "email", placeholder = "Email input")
-    val passwordInput: PasswordLoginInput = PasswordLoginInput("password", "Password input")
-    val ssoProviders = mapOf(
-        "Google" to R.drawable.google,
-        "Facebook" to R.drawable.facebook,
-    )
-
-    val clear: () -> Unit = {
-        this.nameInput.value!!.value = ""
-        this.passwordInput.value!!.value = ""
-    }
-
-    val login: () -> Unit = {
-        val checkName: (String?) -> Boolean = { value -> (value?.endsWith("@test.com", ignoreCase = true))?:false}
-        val checkPass: (String?) -> Boolean = { value -> (value?.contentEquals("Password123"))?:false}
-        if (checkName(nameInput.value?.value) && checkPass(passwordInput.value?.value)) {
-            navController.navigate("Home/${nameInput.value?.value}")
-        }
-        else {
-            scope.launch {
-                snackbarHostState
-                    .showSnackbar(
-                        "Incorrect credentials", duration = SnackbarDuration.Long,
-                    )
-            }
+    Scaffold { innerPadding ->
+        Column(modifier = Modifier.padding(innerPadding)) {
+            LoginBanner()
+            LoginPanel(formState)
         }
     }
-}
-
-private class PasswordLoginInput(
-    name: String,
-    placeholder: String
-) : LoginInput(name, placeholder) {
-    override val isPassword: Boolean = true
-    var isVisible: MutableState<Boolean>? = null
-
-    val setVisibility: (Boolean) -> Unit = { newValue ->
-        this.isVisible!!.value = newValue
-    }
-}
-
-private open class LoginInput(
-    val name: String,
-    val placeholder: String,
-) {
-    var value: MutableState<String>? = null
-    open val isPassword: Boolean = false
 }
 
 @Composable
@@ -303,18 +262,5 @@ private fun SSOLogin(providerName: String, imageResourceId: Int) {
 @Preview(showBackground = true)
 @Composable
 fun LoginViewPreview() {
-    Ucu2024androidnavigationviewsstylesleccion1Theme {
-        val navController = rememberNavController()
-        val scope = rememberCoroutineScope()
-        val snackbarHostState = remember { SnackbarHostState() }
-
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            }
-        ) { innerPadding ->
-            LoginView(Modifier.padding(innerPadding), navController, scope, snackbarHostState)
-        }
-    }
+    LoginView()
 }

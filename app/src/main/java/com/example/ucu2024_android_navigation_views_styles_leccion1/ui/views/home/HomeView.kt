@@ -70,11 +70,45 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.ucu2024_android_navigation_views_styles_leccion1.R
-import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.alt1.Ucu2024androidnavigationviewsstylesleccion1Theme
+import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.AppTheme
 
 
 @Composable
-fun HomeView(modifier: Modifier, navController: NavController, userMail: String?) {
+fun HomeView(userMail: String?, onDetailsNavigation: (String) -> Unit = {}, onLogoutNavigation: () -> Unit = {}) {
+    Scaffold { innerPadding ->
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxSize(1f)
+                .padding(innerPadding),
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1.2f)
+                    .background(MaterialTheme.colorScheme.secondaryContainer)
+            ) {
+                ProfileContainer(modifier, navController, userMail)
+            }
+            Row(
+                modifier = Modifier
+                    .fillMaxSize(1f)
+                    .weight(1f)
+                    .background(
+                        MaterialTheme.colorScheme.surface
+                    )
+            ) {
+                DetailsContainer(modifier, navController)
+            }
+        }
+    }
+}
+
+
+
+@Composable
+fun HomeView2(modifier: Modifier, navController: NavController, userMail: String?) {
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -116,7 +150,10 @@ private fun ProfileContainer(modifier: Modifier, navController: NavController, u
             Column(
                 horizontalAlignment = Alignment.Start,
                 verticalArrangement = Arrangement.SpaceBetween,
-                modifier = modifier.fillMaxHeight(1f).weight(0.65f).padding(30.dp),
+                modifier = modifier
+                    .fillMaxHeight(1f)
+                    .weight(0.65f)
+                    .padding(30.dp),
             ) {
                 Column {
                     Text(text = "Billy Kid", style = MaterialTheme.typography.headlineMedium, color = MaterialTheme.colorScheme.onPrimaryContainer, )
@@ -302,11 +339,5 @@ private fun ButtonsBar(modifier: Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun HomeViewPreview() {
-    Ucu2024androidnavigationviewsstylesleccion1Theme {
-        val navController = rememberNavController()
-
-        Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-            HomeView(Modifier.padding(innerPadding), navController, "hallo@mail.com")
-        }
-    }
+    HomeView(userMail = "billykid@test.com")
 }

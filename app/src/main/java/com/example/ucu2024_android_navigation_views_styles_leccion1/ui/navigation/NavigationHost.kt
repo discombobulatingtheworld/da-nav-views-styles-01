@@ -15,15 +15,16 @@ import kotlinx.coroutines.CoroutineScope
 
 @Composable
 fun NavigationHost(
-    modifier: Modifier = Modifier,
     navController: NavHostController,
     startDestination: String,
-    scope: CoroutineScope,
-    snackbarHostState: SnackbarHostState,
 ) {
-    NavHost(navController, startDestination, modifier = modifier) {
+    NavHost(navController, startDestination) {
         composable("Login") {
-            LoginView(modifier = modifier, navController, scope, snackbarHostState)
+            LoginView(
+                onLoginNavigation = { user: String ->
+                    navController.navigate("Home/${user}")
+                }
+            )
         }
         composable(
             "Home/{userMail}",
@@ -31,7 +32,6 @@ fun NavigationHost(
                 navArgument("userMail") { type = NavType.StringType}
             )
         ) { backStackEntry -> HomeView(
-            modifier = modifier,
             navController,
             backStackEntry.arguments?.getString("userMail")
         ) }
