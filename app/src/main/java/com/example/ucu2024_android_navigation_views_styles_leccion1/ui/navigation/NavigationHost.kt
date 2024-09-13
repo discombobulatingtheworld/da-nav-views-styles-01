@@ -32,7 +32,6 @@ fun NavigationHost(
                 navArgument("userMail") { type = NavType.StringType}
             )
         ) { backStackEntry -> HomeView(
-            navController,
             backStackEntry.arguments?.getString("userMail")
         ) }
     }

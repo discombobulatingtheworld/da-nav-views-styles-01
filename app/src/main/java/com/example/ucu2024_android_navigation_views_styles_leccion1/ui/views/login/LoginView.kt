@@ -262,5 +262,7 @@ private fun SSOLogin(providerName: String, imageResourceId: Int) {
 @Preview(showBackground = true)
 @Composable
 fun LoginViewPreview() {
-    LoginView()
+    AppTheme {
+        LoginView()
+    }
 }

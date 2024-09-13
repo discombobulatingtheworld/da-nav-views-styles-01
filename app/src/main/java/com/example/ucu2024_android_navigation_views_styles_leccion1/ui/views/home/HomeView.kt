@@ -89,7 +89,7 @@ fun HomeView(userMail: String?, onDetailsNavigation: (String) -> Unit = {}, onLo
                     .weight(1.2f)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
             ) {
-                ProfileContainer(modifier, navController, userMail)
+                //ProfileContainer(modifier, navController, userMail)
             }
             Row(
                 modifier = Modifier
@@ -99,7 +99,7 @@ fun HomeView(userMail: String?, onDetailsNavigation: (String) -> Unit = {}, onLo
                         MaterialTheme.colorScheme.surface
                     )
             ) {
-                DetailsContainer(modifier, navController)
+                //DetailsContainer(modifier, navController)
             }
         }
     }
