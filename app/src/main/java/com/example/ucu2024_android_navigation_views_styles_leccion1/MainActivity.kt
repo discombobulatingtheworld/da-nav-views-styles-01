@@ -7,6 +7,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
@@ -20,12 +24,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             Ucu2024androidnavigationviewsstylesleccion1Theme {
                 val navController = rememberNavController()
+                val scope = rememberCoroutineScope()
+                val snackbarHostState = remember { SnackbarHostState() }
 
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    snackbarHost = {
+                        SnackbarHost(hostState = snackbarHostState)
+                    }
+                ) { innerPadding ->
                     NavigationHost(
                         modifier = Modifier.padding(innerPadding),
                         navController = navController,
                         startDestination = "Login",
+                        scope = scope,
+                        snackbarHostState = snackbarHostState,
                     )
                 }
             }
