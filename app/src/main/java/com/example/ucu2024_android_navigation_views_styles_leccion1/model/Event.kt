@@ -7,4 +7,5 @@ data class Event(
     val remainingHours: Int,
     val details: String,
     val followers: List<Profile>,
+    val streetView: Int,
 )

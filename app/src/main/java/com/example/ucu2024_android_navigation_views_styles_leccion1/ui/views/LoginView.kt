@@ -1,11 +1,12 @@
 package com.example.ucu2024_android_navigation_views_styles_leccion1.ui.views
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -13,76 +14,72 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.TextUnit
-import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.unit.dp
 import com.example.ucu2024_android_navigation_views_styles_leccion1.R
-import com.example.ucu2024_android_navigation_views_styles_leccion1.state.ActivityState
 import com.example.ucu2024_android_navigation_views_styles_leccion1.state.LoginInput
 import com.example.ucu2024_android_navigation_views_styles_leccion1.state.LoginState
 import com.example.ucu2024_android_navigation_views_styles_leccion1.state.PasswordLoginInput
+import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.components.TextButtonThemed
 import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.AppTheme
 
-
 @Composable
-fun LoginView(activityState: ActivityState = ActivityState(), onLoginNavigation: (String) -> Unit = {}) {
+fun LoginView(onLoginNavigation: (String) -> Unit = {}) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val formState = LoginState(
         onLoginNavigation,
         rememberCoroutineScope(),
-        remember { SnackbarHostState() },
-        )
-    formState.nameInput.value = remember { mutableStateOf<String>("") }
-    formState.passwordInput.value = remember { mutableStateOf<String>("") }
-    formState.passwordInput.isVisible = remember { mutableStateOf<Boolean>(false) }
+        snackbarHostState,
+    )
+    formState.nameInput.value = remember { mutableStateOf("") }
+    formState.passwordInput.value = remember { mutableStateOf("") }
+    formState.passwordInput.isVisible = remember { mutableStateOf(false) }
 
-    Scaffold { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            LoginBanner()
-            LoginPanel(formState)
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { innerPadding ->
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(innerPadding)
+                .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+                .fillMaxSize()
+
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.padding(10.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.app_logo),
+                    contentDescription = "Logo",
+                    contentScale = ContentScale.FillWidth,
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurfaceVariant),
+                    modifier = Modifier
+                        .size(120.dp)
+                )
+                LoginPanel(formState)
+            }
         }
-    }
-}
-
-@Composable
-private fun LoginBanner() {
-    Box {
-        Image(
-            painter = painterResource(id = R.drawable.login_banner),
-            contentDescription = "Login!",
-            contentScale = ContentScale.FillWidth,
-            colorFilter = ColorFilter.lighting(Color.Gray, Color.Black),
-            modifier = Modifier
-                .fillMaxWidth(1f),
-        )
-        Text(
-            text = "Log in",
-            fontSize = TextUnit(7f, TextUnitType.Em),
-            color = Color.White,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(10.dp)
-        )
     }
 }
 
@@ -137,6 +134,11 @@ private fun LoginInputField(input: LoginInput) {
             .fillMaxWidth(1f),
         visualTransformation = if (input.isPassword && !(input as PasswordLoginInput).isVisible!!.value) PasswordVisualTransformation() else VisualTransformation.None,
         trailingIcon = if (input.isPassword) toggle else null,
+        colors = TextFieldDefaults.colors().copy(
+            focusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        )
     )
 }
 
@@ -161,28 +163,17 @@ private fun PasswordToggle(input: PasswordLoginInput) {
 @Composable
 private fun LoginActions(formState: LoginState) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(vertical = 15.dp)
-    ) {
-        LoginButton(formState.login)
-        LoginOptions()
-    }
-}
-
-@Composable
-private fun LoginButton(onClick: () -> Unit) {
-    TextButton(
-        onClick = onClick,
-        border = BorderStroke(1.dp, color = Color.Gray),
-        shape = RectangleShape,
-        modifier = Modifier
             .fillMaxWidth(1f)
-            .padding(5.dp),
     ) {
-        Text(
-            text = "LOGIN",
-            modifier = Modifier.padding(5.dp)
+        TextButtonThemed(
+            text = "Login",
+            modifier = Modifier.fillMaxWidth(),
+            onClick = formState.login
         )
+        LoginOptions()
     }
 }
 
@@ -252,8 +243,21 @@ private fun SSOLogin(providerName: String, imageResourceId: Int) {
 
 @Preview(showBackground = true)
 @Composable
-fun LoginViewPreview() {
-    AppTheme {
+fun LoginViewLightPreview() {
+    AppTheme(
+        darkTheme = false,
+    ) {
+        LoginView()
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun LoginViewDarkPreview() {
+    AppTheme(
+        darkTheme = true,
+    ) {
         LoginView()
     }
 }

@@ -27,7 +27,6 @@ fun NavigationHost(
     NavHost(navController, startDestination) {
         composable("Login") {
             LoginView(
-                activityState = activityState,
                 onLoginNavigation = { user: String ->
                     navController.navigate("Home/${user}")
                 }

@@ -7,18 +7,13 @@ import com.example.ucu2024_android_navigation_views_styles_leccion1.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-class LoginState(onLoginNavigation: (String) -> Unit, scope: CoroutineScope, snackbarHostState: SnackbarHostState) {
+class LoginState(onLoginNavigation: (String) -> Unit, private val scope: CoroutineScope, private val snackbarHostState: SnackbarHostState) {
     val nameInput: LoginInput = LoginInput(name = "email", placeholder = "Email input")
     val passwordInput: PasswordLoginInput = PasswordLoginInput("password", "Password input")
     val ssoProviders = mapOf(
         "Google" to R.drawable.google,
         "Facebook" to R.drawable.facebook,
     )
-
-    val clear: () -> Unit = {
-        this.nameInput.value!!.value = ""
-        this.passwordInput.value!!.value = ""
-    }
 
     val login: () -> Unit = {
         val checkName: (String?) -> Boolean = { value -> (value?.endsWith("@test.com", ignoreCase = true))?:false}
@@ -30,7 +25,7 @@ class LoginState(onLoginNavigation: (String) -> Unit, scope: CoroutineScope, sna
             scope.launch {
                 snackbarHostState
                     .showSnackbar(
-                        "Incorrect credentials", duration = SnackbarDuration.Long,
+                        "Incorrect credentials",
                     )
             }
         }

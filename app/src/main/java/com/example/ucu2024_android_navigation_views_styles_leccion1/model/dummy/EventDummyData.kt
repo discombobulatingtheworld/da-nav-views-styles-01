@@ -13,6 +13,7 @@ fun generateEventDummyData(profiles: List<Profile> = generateProfileDummyData())
             150,
             "• During the event, Proxies can head to the HIA Club and talk to Lyla to participate in an all-new VR Challenge.\n• During the event, a new themed stage will become available each day. After completing the first 6 themed stages, Advanced Drills will be unlocked.\n• In these event stages, achieving certain Trigger Requirements will trigger limited-duration Combat Buffs. In Advanced Drills, Proxies can freely mix and match Trigger Requirements and Combat Buffs to fight!\n• Proxies can choose to use the Trial Agents and Bangboo provided in the stage for the challenge.\n• Complete the event stages to obtain [Tuning Calibrators], [Polychromes], and other rewards.",
             profiles,
+            R.drawable.street_view_01,
         ),
         Event(
             "Scene One, Shot One!",
@@ -21,6 +22,7 @@ fun generateEventDummyData(profiles: List<Profile> = generateProfileDummyData())
             80,
             "",
             profiles,
+            R.drawable.street_view_02,
         ),
         Event(
             "\"En-Nah\" Into Your Lap",
@@ -29,6 +31,7 @@ fun generateEventDummyData(profiles: List<Profile> = generateProfileDummyData())
             115,
             "",
             profiles,
+            R.drawable.street_view_03,
         ),
     )
 }

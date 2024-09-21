@@ -2,13 +2,11 @@ package com.example.ucu2024_android_navigation_views_styles_leccion1.ui.componen
 
 import android.content.res.Resources.getSystem
 import android.graphics.PointF
-import android.graphics.fonts.FontFamily
-import android.graphics.fonts.FontStyle
-import android.widget.Button
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -22,16 +20,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Badge
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardColors
 import androidx.compose.material3.ElevatedButton
@@ -50,7 +45,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -59,24 +53,18 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageShader
-import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.TileMode
-import androidx.compose.ui.graphics.asComposePath
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.drawscope.scale
-import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.invisibleToUser
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -90,25 +78,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.PathParser
 import androidx.core.graphics.minus
 import androidx.core.graphics.plus
-import androidx.core.graphics.times
-import androidx.graphics.shapes.RoundedPolygon
-import androidx.graphics.shapes.toPath
 import com.example.ucu2024_android_navigation_views_styles_leccion1.R
 import com.example.ucu2024_android_navigation_views_styles_leccion1.model.Profile
 import com.example.ucu2024_android_navigation_views_styles_leccion1.model.dummy.generateProfileDummyData
 import com.example.ucu2024_android_navigation_views_styles_leccion1.ui.theme.AppTheme
-import java.util.regex.Pattern
 import kotlin.math.PI
-import kotlin.math.abs
-import kotlin.math.asin
 import kotlin.math.atan
-import kotlin.math.cos
-import kotlin.math.max
 import kotlin.math.pow
-import kotlin.math.sin
 import kotlin.math.sqrt
 import kotlin.math.tan
 
@@ -403,17 +381,18 @@ fun OutlinedIconButtonThemed(
     Box(
         modifier = modifier
     ) {
+        val colors = IconButtonColors(
+            contentColor = MaterialTheme.colorScheme.primary,
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            disabledContentColor = MaterialTheme.colorScheme.outline,
+            disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        )
         OutlinedIconButton(
             onClick = onClick,
             shape = RoundedCornerShape(8.dp),
             enabled = enabled,
-            colors = IconButtonColors(
-                contentColor = MaterialTheme.colorScheme.primary,
-                containerColor = MaterialTheme.colorScheme.surface,
-                disabledContentColor = MaterialTheme.colorScheme.outlineVariant,
-                disabledContainerColor = MaterialTheme.colorScheme.inverseOnSurface,
-            ),
-            border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
+            colors = colors,
+            border = BorderStroke(2.dp, if (enabled) colors.contentColor else colors.disabledContentColor),
             modifier = Modifier
                 .padding(10.dp)
                 .fillMaxHeight(),
@@ -444,14 +423,13 @@ fun TextButtonThemed(
                 disabledContentColor = MaterialTheme.colorScheme.inverseOnSurface,
                 disabledContainerColor = MaterialTheme.colorScheme.outlineVariant,
             ),
-            modifier = Modifier
-                .padding(10.dp)
-                .fillMaxHeight(),
+            modifier = modifier
+                .padding(10.dp),
         ) {
             Text(
                 text = text,
                 style = MaterialTheme.typography.labelLarge,
-                modifier = modifier.padding(vertical = 3.dp, horizontal = 10.dp),
+                modifier = Modifier.padding(vertical = 3.dp, horizontal = 10.dp),
                 textAlign = TextAlign.Center
             )
         }
@@ -531,18 +509,69 @@ fun BackButtonThemed(iconResource: Int, description: String, onClick: () -> Unit
 }
 
 @Composable
-fun UserPlaqueContainer(modifier: Modifier = Modifier, content: @Composable (RowScope.() -> Unit)) {
+fun UserPlaque(profile: Profile, onClick: (() -> Unit)? = null) {
+    val modifier = if (onClick == null) Modifier else Modifier.clickable {
+        onClick()
+    }
+
+    RaisedContainer(modifier) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End,
+            modifier = Modifier
+                .padding(5.dp)
+                .requiredWidth(200.dp),
+        ) {
+            Column(
+                horizontalAlignment = Alignment.End,
+                modifier = Modifier.padding(start = 20.dp, end = 10.dp)
+            ) {
+                UserPlaqueNameTag("${profile.name} ${profile.lastName}", profile.email)
+            }
+            UserPlaqueAvatar(profile.avatar)
+        }
+    }
+}
+
+@Composable
+fun TopNavButton(iconResource: Int, description: String, modifier: Modifier = Modifier, onClick: () -> Unit = {}) {
     val i1 = remember { mutableStateOf(Offset.Zero) }
     val i2 = remember { mutableStateOf(Offset.Infinite) }
-    val cornerRadius = 10.dp
+
+    IconButton(
+        modifier = modifier
+            .onSizeChanged(containerThemedOnSizeChanged(i1, i2))
+            .shadow(2.dp, shape = CircleShape)
+            .background(color = MaterialTheme.colorScheme.surfaceContainerHigh, shape = CircleShape)
+            .border(
+                2.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.White.copy(alpha = 0.1f),
+                        Color.Black.copy(alpha = 0.3f),
+                    ),
+                    start = i1.value,
+                    end = i2.value,
+                    tileMode = TileMode.Clamp,
+                ),
+                shape = CircleShape
+            ),
+        onClick = onClick,
+    ) {
+        Icon(
+            painter = painterResource(id = iconResource),
+            contentDescription = description,
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun RaisedContainer(modifier: Modifier = Modifier, content: @Composable (RowScope.() -> Unit)) {
+    val i1 = remember { mutableStateOf(Offset.Zero) }
+    val i2 = remember { mutableStateOf(Offset.Infinite) }
 
     Row(
-//        colors = CardColors(
-//            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-//            contentColor = MaterialTheme.colorScheme.onSurface,
-//            disabledContainerColor = MaterialTheme.colorScheme.surfaceDim,
-//            disabledContentColor = MaterialTheme.colorScheme.onSurface,
-//        ),
         modifier = modifier
             .onSizeChanged(containerThemedOnSizeChanged(i1, i2))
             .shadow(2.dp, shape = CircleShape)
@@ -565,20 +594,69 @@ fun UserPlaqueContainer(modifier: Modifier = Modifier, content: @Composable (Row
 }
 
 @Composable
-fun UserPlaque(profile: Profile, onBackNavigation: (() -> Unit) = {}) {
-    UserPlaqueContainer() {
-        Text(text = "Test", color = MaterialTheme.colorScheme.onSurface)
-    }
+private fun UserPlaqueAvatar(imgResource: Int) {
+    Image(
+        painter = painterResource(id = imgResource),
+        contentDescription = "Profile",
+        modifier = Modifier
+            .size(40.dp)
+            .border(
+                3.dp,
+                brush = Brush.linearGradient(
+                    colors = listOf(
+                        Color.Black.copy(alpha = 0.2f),
+                        Color.White.copy(alpha = 0.1f),
+                    ),
+                    start = Offset.Zero,
+                    end = Offset.Infinite,
+                    tileMode = TileMode.Clamp,
+                ),
+                shape = CircleShape
+            )
+            .border(
+                BorderStroke(3.dp, MaterialTheme.colorScheme.surfaceContainer),
+                CircleShape
+            )
+            .padding(3.dp)
+            .clip(CircleShape)
+            .size(40.dp),
+    )
+}
+
+@Composable
+private fun UserPlaqueNameTag(userName: String, userEmail: String) {
+    Text(text = userName, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelMedium)
+    Text(text = userEmail, color = MaterialTheme.colorScheme.onSurface, style = MaterialTheme.typography.labelSmall)
+}
+
+@Composable
+fun AlertDialogThemed(title: String, text: String, confirmLabel: String = "Confirm", onConfirm: () -> Unit = {}, dismissLabel: String = "Cancel", onDismissRequest: () -> Unit = {}) {
+    val commonModifier = Modifier.height(IntrinsicSize.Min)
+    AlertDialog(
+        onDismissRequest = onDismissRequest,
+        shape = RoundedCornerShape(10.dp),
+        title = { Text(text = title) },
+        text = { Text(text = text) },
+        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        confirmButton = {
+            TextButtonThemed("Si, cerrar sesión", onClick = onConfirm, modifier = commonModifier)
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest, modifier = Modifier.padding(vertical = 10.dp)) {
+                Text(text = "Cancelar")
+            }
+        }
+    )
 }
 
 
 
 
-//@Preview(showBackground = true)
-//@Composable
-//fun BackButtonThemedPreview() {
-//    BackButtonThemed(R.drawable.baseline_logout_24, "Logout")
-//}
+@Preview(showBackground = true)
+@Composable
+fun BackButtonThemedPreview() {
+    BackButtonThemed(R.drawable.baseline_logout_24, "Logout")
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -599,5 +677,27 @@ fun UserPlaquePreviewLight() {
         darkTheme = false
     ) {
         UserPlaque(profile)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopNavButtonPreviewDark() {
+    val profile = generateProfileDummyData()[0]
+    AppTheme(
+        darkTheme = true
+    ) {
+        TopNavButton(R.drawable.baseline_logout_24, "Profile")
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun TopNavButtonPreviewLight() {
+    val profile = generateProfileDummyData()[0]
+    AppTheme(
+        darkTheme = false
+    ) {
+        TopNavButton(R.drawable.baseline_logout_24, "Profile")
     }
 }
